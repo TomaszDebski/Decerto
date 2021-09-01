@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/quotes")
 public class QuoteController {
 
     private final QuoteRepository quoteRepository;
@@ -16,23 +17,23 @@ public class QuoteController {
         this.quoteRepository = quoteRepository;
     }
 
-    @GetMapping("/quotes")
+    @GetMapping
     public List<Quote> allQuotes() {
         return quoteRepository.findAll();
     }
 
-    @PostMapping("/quotes")
-    public Quote newEmployee(@RequestBody Quote newQuote) {
+    @PostMapping
+    public Quote newQuote(@RequestBody Quote newQuote) {
         return quoteRepository.save(newQuote);
     }
 
-    @GetMapping("/quotes/{id}")
+    @GetMapping("/{id}")
     Quote getQuote(@PathVariable Long id) {
         return quoteRepository.findById(id)
                 .orElseThrow(() -> new QuoteNotFoundException(id));
     }
 
-    @PutMapping("/quotes/{id}")
+    @PutMapping("/{id}")
     Quote updateQuote(@RequestBody Quote newQuote, @PathVariable Long id) {
 
         return quoteRepository.findById(id)
@@ -48,8 +49,11 @@ public class QuoteController {
                 });
     }
 
-    @DeleteMapping("/quotes/{id}")
+    @DeleteMapping("/{id}")
     void deleteQuote(@PathVariable Long id) {
+        if(!quoteRepository.existsById(id)){
+            throw new QuoteNotFoundException(id);
+        }
         quoteRepository.deleteById(id);
     }
 }
