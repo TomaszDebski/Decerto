@@ -2,6 +2,7 @@
 Spring boot application with spring data  
 Database: H2  
 Spring data pagination to limit the number of records
+With the builder design pattern
 
 To run:   
 mvn clean spring-boot:run
