@@ -1,30 +1,16 @@
-package com.tomaszdebski.decerto.entity;
+package com.tomaszdebski.decerto.dto;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+public class QuoteDto {
 
-@Entity
-public class Quote {
-
-    public Quote() {
-    }
-
-    @Id
-    @GeneratedValue
     private long id;
-
-    @Column(name = "author_first_name")
     private String authorFirstName;
-
-    @Column(name = "author_last_name")
     private String authorLastName;
-
-    @Column(name = "content")
     private String content;
 
-    public Quote(String authorFirstName, String authorLastName, String content) {
+    public QuoteDto(){}
+
+    public QuoteDto(long id, String authorFirstName, String authorLastName, String content) {
+        this.id = id;
         this.authorFirstName = authorFirstName;
         this.authorLastName = authorLastName;
         this.content = content;
@@ -62,30 +48,6 @@ public class Quote {
         this.content = content;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Quote quote = (Quote) o;
-
-        if (id != quote.id) return false;
-        if (authorFirstName != null ? !authorFirstName.equals(quote.authorFirstName) : quote.authorFirstName != null)
-            return false;
-        if (authorLastName != null ? !authorLastName.equals(quote.authorLastName) : quote.authorLastName != null)
-            return false;
-        return content != null ? content.equals(quote.content) : quote.content == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (authorFirstName != null ? authorFirstName.hashCode() : 0);
-        result = 31 * result + (authorLastName != null ? authorLastName.hashCode() : 0);
-        result = 31 * result + (content != null ? content.hashCode() : 0);
-        return result;
-    }
-
     public static QuoteBuilder builder() {
         return new QuoteBuilder();
     }
@@ -117,8 +79,8 @@ public class Quote {
             return this;
         }
 
-        public Quote build() {
-            return new Quote(authorFirstName, authorLastName, content);
+        public QuoteDto build() {
+            return new QuoteDto(id, authorFirstName, authorLastName, content);
         }
     }
 }

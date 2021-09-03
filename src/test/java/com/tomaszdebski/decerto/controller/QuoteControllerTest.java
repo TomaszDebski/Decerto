@@ -1,8 +1,8 @@
 package com.tomaszdebski.decerto.controller;
 
-import com.tomaszdebski.decerto.entity.Quote;
+import com.tomaszdebski.decerto.dto.QuoteDto;
 import com.tomaszdebski.decerto.exception.QuoteNotFoundException;
-import com.tomaszdebski.decerto.repository.QuoteRepository;
+import com.tomaszdebski.decerto.service.QuoteService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,10 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,18 +31,31 @@ public class QuoteControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private QuoteRepository quoteRepository;
+    private QuoteService quoteService;
 
     @Test
-    public void getAllQ() throws Exception
+    public void getAllQuotes() throws Exception
     {
-        Quote quote = new Quote(1L, "authorFirstName", "authorLastName" , "content");
-        Quote quote2 = new Quote(2L, "authorFirstName2", "authorLastName2" , "content2");
-        List<Quote> quotes = Arrays.asList(quote, quote2);
-        when(quoteRepository.findAll()).thenReturn(quotes);
+        QuoteDto quoteDto = QuoteDto.builder()
+                .withId(1L)
+                .withAuthorFirstName("firstName1")
+                .withAuthorLastName("LastName1")
+                .withContent("content1").build();
+        QuoteDto quoteDto2 = QuoteDto.builder()
+                .withId(2L)
+                .withAuthorFirstName("firstName2")
+                .withAuthorLastName("LastName2")
+                .withContent("content2").build();
+        List<QuoteDto> quotes = Arrays.asList(quoteDto, quoteDto2);
+        when(quoteService.getAllQuote(1,10)).thenReturn(quotes);
+
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("pageNo", "1");
+        requestParams.add("pageSize", "10");
 
         mockMvc.perform( MockMvcRequestBuilders
                         .get("/quotes")
+                        .params(requestParams)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -54,8 +67,12 @@ public class QuoteControllerTest {
 
     @Test
     public void checkOneQuote() throws Exception{
-        Quote quote = new Quote(1L, "authorFirstName", "authorLastName" , "content");
-        when(quoteRepository.findById(1L)).thenReturn(Optional.of(quote));
+        QuoteDto quoteDto = QuoteDto.builder()
+                .withId(1L)
+                .withAuthorFirstName("authorFirstName")
+                .withAuthorLastName("authorLastName")
+                .withContent("content").build();
+        when(quoteService.getQuote(1L)).thenReturn(quoteDto);
 
         mockMvc.perform(MockMvcRequestBuilders.
                         get("/quotes/1")
@@ -71,7 +88,7 @@ public class QuoteControllerTest {
 
     @Test
     public void checkOneQuoteThrowException() throws Exception{
-        when(quoteRepository.findById(1L)).thenThrow(new QuoteNotFoundException(1L));
+        when(quoteService.getQuote(1L)).thenThrow(new QuoteNotFoundException(1L));
 
         mockMvc.perform(MockMvcRequestBuilders.
                         get("/quotes/1")

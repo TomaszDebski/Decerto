@@ -1,8 +1,7 @@
 package com.tomaszdebski.decerto.controller;
 
-import com.tomaszdebski.decerto.entity.Quote;
-import com.tomaszdebski.decerto.exception.QuoteNotFoundException;
-import com.tomaszdebski.decerto.repository.QuoteRepository;
+import com.tomaszdebski.decerto.dto.QuoteDto;
+import com.tomaszdebski.decerto.service.QuoteService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,49 +10,36 @@ import java.util.List;
 @RequestMapping("/quotes")
 public class QuoteController {
 
-    private final QuoteRepository quoteRepository;
+    private QuoteService quoteService;
 
-    public QuoteController(QuoteRepository quoteRepository) {
-        this.quoteRepository = quoteRepository;
+    public QuoteController(QuoteService quoteService) {
+        this.quoteService = quoteService;
     }
 
     @GetMapping
-    public List<Quote> allQuotes() {
-        return quoteRepository.findAll();
+    public List<QuoteDto> allQuotes(@RequestParam Integer pageNo,
+                                    @RequestParam Integer pageSize) {
+        return quoteService.getAllQuote(pageNo, pageSize);
     }
 
     @PostMapping
-    public Quote newQuote(@RequestBody Quote newQuote) {
-        return quoteRepository.save(newQuote);
+    public QuoteDto addQuote(@RequestBody QuoteDto newQuote) {
+        return quoteService.addQuote(newQuote);
     }
 
     @GetMapping("/{id}")
-    Quote getQuote(@PathVariable Long id) {
-        return quoteRepository.findById(id)
-                .orElseThrow(() -> new QuoteNotFoundException(id));
+    public QuoteDto getQuote(@PathVariable Long id) {
+        return quoteService.getQuote(id);
     }
 
     @PutMapping("/{id}")
-    Quote updateQuote(@RequestBody Quote newQuote, @PathVariable Long id) {
-
-        return quoteRepository.findById(id)
-                .map(quote -> {
-                    quote.setAuthorFirstName(newQuote.getAuthorFirstName());
-                    quote.setAuthorLastName(newQuote.getAuthorLastName());
-                    quote.setContent(newQuote.getContent());
-                    return quoteRepository.save(quote);
-                })
-                .orElseGet(() -> {
-                    newQuote.setId(id);
-                    return quoteRepository.save(newQuote);
-                });
+    public QuoteDto updateQuote(@RequestBody QuoteDto newQuote, @PathVariable Long id) {
+        return quoteService.updateQuote(newQuote, id);
     }
 
     @DeleteMapping("/{id}")
-    void deleteQuote(@PathVariable Long id) {
-        if(!quoteRepository.existsById(id)){
-            throw new QuoteNotFoundException(id);
-        }
-        quoteRepository.deleteById(id);
+    public void deleteQuote(@PathVariable Long id) {
+        quoteService.deleteQuote(id);
     }
+
 }
