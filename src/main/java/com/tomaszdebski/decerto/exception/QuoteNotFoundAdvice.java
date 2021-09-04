@@ -12,7 +12,7 @@ public class QuoteNotFoundAdvice {
     @ResponseBody
     @ExceptionHandler(QuoteNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String quoteNotFoundHandler(QuoteNotFoundException ex) {
+    public String quoteNotFoundHandler(QuoteNotFoundException ex) {
         return ex.getMessage();
     }
 }

@@ -5,7 +5,6 @@ import com.tomaszdebski.decerto.entity.Quote;
 import com.tomaszdebski.decerto.exception.QuoteNotFoundException;
 import com.tomaszdebski.decerto.repository.QuoteRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,13 +17,13 @@ import java.util.stream.Collectors;
 @Service
 public class QuoteServiceImpl implements QuoteService {
 
-    QuoteRepository quoteRepository;
+    private QuoteRepository quoteRepository;
 
-    @Autowired
     private ModelMapper modelMapper;
 
-    public QuoteServiceImpl(QuoteRepository quoteRepository) {
+    public QuoteServiceImpl(QuoteRepository quoteRepository, ModelMapper modelMapper) {
         this.quoteRepository = quoteRepository;
+        this.modelMapper = modelMapper;
     }
 
     public List<QuoteDto> getAllQuote(Integer pageNo, Integer pageSize) {
